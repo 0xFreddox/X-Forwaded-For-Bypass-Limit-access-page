@@ -2,32 +2,34 @@ import requests
 import sys
 
 banner = """
-
-
 ███████╗██████╗ ███████╗██████╗ ██████╗  ██████╗ ██╗  ██╗
 ██╔════╝██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗╚██╗██╔╝
 █████╗  ██████╔╝█████╗  ██║  ██║██║  ██║██║   ██║ ╚███╔╝ 
 ██╔══╝  ██╔══██╗██╔══╝  ██║  ██║██║  ██║██║   ██║ ██╔██╗ 
 ██║     ██║  ██║███████╗██████╔╝██████╔╝╚██████╔╝██╔╝ ██╗
 ╚═╝     ╚═╝  ╚═╝╚══════╝╚═════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
-
 """
+
 def main():
     try:
         print(banner)
-        headers = {"X-Forwarded-For":sys.argv[1]}
-        origin = "http://httpbin.org/ip"
-        url = sys.argv[2]
-        res = requests.get(url,headers=headers)
-        if res.status_code == 200:
-            print(res.content)
-        if res.status_code == 400:
-            print("[ERROR]")
-            print(res.content)
-        if res.status_code == 401:
-            print("[ERROR]401")
-            print(res.content)
+        if len(sys.argv) != 3:
+            print("[Usage] python3 XFF.py [XFF_IP] [TARGET_URL]")
+            return
+
+        xff_ip = sys.argv[1]
+        target_url = sys.argv[2]
+        headers = {"X-Forwarded-For": xff_ip}
+
+        response = requests.get(target_url, headers=headers)
+        if response.status_code == 200:
+            print(response.content)
+        else:
+            print(f"[ERROR] Status Code: {response.status_code}")
+            print(response.content.decode('utf-8'))
+
     except IndexError:
-        print("[Example]python3 XFF.py [PORT]8.8.8.8 [URL_TARGET]http://example.com")
-        print("[TIP]at the beginning,in url target use http://httpbin.org/ip for see the IPs ")
-main()
+        print("[Usage] python3 XFF.py [XFF_IP] [TARGET_URL]")
+
+if __name__ == "__main__":
+    main()
